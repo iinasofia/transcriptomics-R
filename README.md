@@ -186,7 +186,7 @@ dim(genes)
 
 #This is where the actual analysis begins, above is QC/cleanup 
 #change timepoint
-# Barplot of library sizes
+# Barplot of library sizes -- this will create a barplot of library sizes (i.e. how big the reads are)
 png("3-QC/Barplot of library sizes.png", width = 90, height = 30, units = 'cm', res = 300)
 col <- as.numeric(y$sample$timepoint)
 dt <- colSums((y$counts)*1e-6)
@@ -225,9 +225,9 @@ top5; top10; top25
 dim(y)
 summary(rowMeans(y$counts))
 
-# Histogram of count distribution
+# Histogram of count distribution - this will create a plot of read count distributions 
 # pseudocount of 0.25 added to values to prevent logging zero values
-# therefore O CPM = lcpm -6.9
+# therefore O CPM = lcpm -6.9 --- counts per million reads mapped (CPM) = the count of sequenced fragments mapping to the feature 
 lcpm.AvgCounts <- cpm(AvgCounts, log = TRUE)
 png("3-QC/Read Count Distribution-B4.png", width = 45, height = 25, units = 'cm', res = 600)
 par(mar=c(5,6,4,1)+.1)
@@ -237,7 +237,7 @@ hist(lcpm.AvgCounts, col="salmon", border="salmon",
      breaks=100, xlim=c(-10,20), main ="Read Count Distribution (before)")
 dev.off()
 
-# number of genes with zero counts across all 211 samples
+# number of genes with zero counts across all 211 samples -- this will spit out the info but not save it 
 table(AvgCounts>=1)
 table(AvgCounts>=10)
 table(AvgCounts>=100)
@@ -264,7 +264,7 @@ log.cutoff <- log2(expr_cutoff)
 # Summary of filtered count data
 summary(rowMeans(y.Filt$counts))
 
-# Density of count values (code modified from 'RNAseq 1-2-3')
+# Density of count values (code modified from 'RNAseq 1-2-3') - this will create graphs of raw and filtered data -- density vs log of CPM
 png("3-QC/Density of count values.png", width = 10, height = 20, units = 'cm', res = 600)
 nsamples <- ncol(y)
 col <- rainbow(nsamples)

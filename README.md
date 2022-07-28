@@ -86,7 +86,7 @@ head(txi$counts, 3)
 write.csv(txi, file = "4-Output/geneSMART_tximport_matrix.csv")
 
 # prepare data
-#start by loading libraries 
+#start by loading libraries. #Use edgeR package to import, organise, filter and normalise the data
 library(edgeR)
 library(Homo.sapiens)
 
@@ -225,7 +225,7 @@ top5; top10; top25
 dim(y)
 summary(rowMeans(y$counts))
 
-# Histogram of count distribution - this will create a plot of read count distributions 
+# Histogram of count distribution - this will create a plot of read count distributions BEFORE FILTERING
 # pseudocount of 0.25 added to values to prevent logging zero values
 # therefore O CPM = lcpm -6.9 --- counts per million reads mapped (CPM) = the count of sequenced fragments mapping to the feature 
 lcpm.AvgCounts <- cpm(AvgCounts, log = TRUE)
@@ -289,7 +289,7 @@ title("Filtered data (median CPM > 0.5)",xlab="log2-CPM")
 dev.off()
 
 
-# Histogram of count distribution
+# Histogram of count distribution  - this will create a plot of read count distributions AFTER FILTERING
 # pseudocount of 0.25 added to values to prevent logging zero values
 # therefore O CPM = lcpm -6.9
 AvgCounts <- rowMeans(y.Filt$counts)
@@ -303,7 +303,7 @@ hist(lcpm.AvgCounts, col="salmon", border="salmon",
 dev.off()
 
 
-# Heatmap of samples
+# Heatmap of samples -- this is useful for visualising the expression of genes across the MSC samples
 png("3-QC/Sample heatmap.png", width = 60, height = 60, units = 'cm', res = 300)
 par(mfrow=c(1,2))
 lcpm.Raw <- cpm(y$counts, log = TRUE)
@@ -312,10 +312,12 @@ title("Raw data")
 lcpm.Filt <- cpm(y.Filt$counts, log = TRUE)
 heatmap(cor(lcpm.Filt))
 title("Filtered data")
-dev.off()
+dev.off() 
+
 
 #################
-##  limma
+##  limma --- provides an integrated solution for analysing data from gene expression experiments.
+#load limma package
 #################
 library(limma)
 
@@ -325,7 +327,7 @@ y.Norm$samples$norm.factors
 summary(y.Norm$samples$norm.factors)
 
 #boxplot BEFORE normalisation
-png("3-QC/Boxplots.png", width = 90, height = 45, units = 'cm', res = 300)
+png("3-QC/BoxplotBefore.png", width = 90, height = 45, units = 'cm', res = 300)
 par(mfrow=c(2,1))
 lcpm.Filt <- cpm(y.Filt, log=TRUE)
 col <- as.numeric(y$sample$timepoint)
@@ -334,7 +336,9 @@ boxplot(lcpm.Filt,las=2,
 abline(h=median(lcpm.Filt),col="black",lty=3)
 title(main="Unnormalised data",ylab="log-counts")
 
-#boxplot AFTER normalisation
+#boxplot AFTER normalisation (limma gains statistical power by modelling the variances AKA normalising data)
+png("3-QC/BoxplotAfter.png", width = 90, height = 45, units = 'cm', res = 300)
+par(mfrow=c(2,1))
 lcpm.Norm <- cpm(y.Norm, log=TRUE)
 boxplot(lcpm.Norm,las=2,
         col=c("lightsalmon","lightcoral","steelblue1","cornsilk")[col],main="")
@@ -349,6 +353,7 @@ dev.off()
 
 dir.create("5-Glimma")
 library(Glimma)
+# Glimma MDS Plot --- Draws an interactive MD plot from a DGEList object with distances calculated from most variable genes.
 glMDSPlot(y.Norm, top=500, labels=y.Norm$samples$subject,
           groups=y.Norm$samples[,c(1:9)], launch=TRUE,
           path="5-Glimma", folder="glMDSPlot", html="MDS_plot")

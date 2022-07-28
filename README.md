@@ -94,7 +94,7 @@ library(Homo.sapiens)
 y <- DGEList(txi$counts)
 dim(y)
 
-# Read in sample information table
+# Read in sample information table #figure out what all this means??
 csvfile <- file.path("2-Input/Cell_sample_table.csv")
 sampleTable <- read.csv(csvfile, row.names=1)
 y$samples$name <- sampleTable$name

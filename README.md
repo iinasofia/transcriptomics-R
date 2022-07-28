@@ -152,8 +152,10 @@ y$samples$run_date <- sampleTable$run_date
 #y$samples$ACSL1 <- sampleTable$ACSL1
 y$samples
 
+#gives you all the column names for all the samples
 colnames <- colnames(y$samples)
 colnames
+
 # Add gene annotation
 geneid <- rownames(y)
 columns(Homo.sapiens)
@@ -182,7 +184,7 @@ y$genes <- genes
 head(genes,5)
 dim(genes)
 
-
+#This is where the actual analysis begins, above is QC/cleanup 
 #change timepoint
 # Barplot of library sizes
 png("3-QC/Barplot of library sizes.png", width = 90, height = 30, units = 'cm', res = 300)

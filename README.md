@@ -14,6 +14,7 @@ docker run -v ${pwd}:/app iinasofia/transcriptome TEST.bam
 #This will run whole docker script for 1 x BAM file as below, steps specified 
 set -e
 
+#set filename
 filename=$1
 
 #removes .bam extension
@@ -59,7 +60,7 @@ getwd()
 library(tximport)
 library(readr)
 
-# tximport of pre-constructed tx2gene table - created from bioMart Ensembl site. Ensure this is in folder
+# tximport of pre-constructed tx2gene table - created from bioMart Ensembl site. Ensure this is in folder, otherwise will not be run 
 tx2gene <- read.csv("2-Input/Homo_sapiens.GRCh38.91_tx2gene.csv")
 head(tx2gene, 5)
 
@@ -72,18 +73,20 @@ names(salmon.files) <- as.matrix(read.csv(file="2-Input/names.csv", sep=",", hea
 all(file.exists(salmon.files))
 
 # tximport
-# countsFromAbundance default is "no" just returns counts not TPM
+# countsFromAbundance default is "no" just returns counts not TPM (transcripts-per-million)
 # scaledTPM is TPM scaled up to library sizewhile lengthScaledTPM
 # lengthScaledTPM first multiplies TPM by feature length and then scales up to library size
 # Both are then quantities that are on the same scale as original counts,
     # except no longer correlated with feature length across samples.
-
+    
+#gene level summary and salmon index building .. quantification file built using salmon as above, this generates an offset matrix for downstream gene-level differential analysis of count matrices
 txi <- tximport(salmon.files, type="salmon", tx2gene=tx2gene, ignoreTxVersion = TRUE, countsFromAbundance="lengthScaledTPM") 
 names(txi)
 head(txi$counts, 3)
 write.csv(txi, file = "4-Output/geneSMART_tximport_matrix.csv")
 
 # prepare data
+#start by loading libraries 
 library(edgeR)
 library(Homo.sapiens)
 

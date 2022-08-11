@@ -321,7 +321,7 @@ dev.off()
 #################
 library(limma)
 
-# Normalisation
+# Normalisation (to eliminate systematic experimental bias and technical variation while preserving biological variation)
 y.Norm <- calcNormFactors(y.Filt, method="TMM")
 y.Norm$samples$norm.factors
 summary(y.Norm$samples$norm.factors)
@@ -349,7 +349,7 @@ dev.off()
 
 
 # UNSUPERVISED CLUSTERING OF SAMPLES
-# MDS plots
+# MDS plots - MDS arranges the points on the plot so that the distances among each pair of points correlates as best as possible to the dissimilarity between those two samples. The values on the two axes tell you nothing about the variables for a given sample - the plot is just a two dimensional space to arrange the points.
 
 dir.create("5-Glimma")
 library(Glimma)
@@ -375,7 +375,7 @@ dev.off()
 
 
 
-# Mean Difference Plots
+# Mean Difference Plots - XY scatter plot that compares the disagreement, or differences, between two quantitative measurements
 # Library size-adjusted log-fold change between two libraries (the difference)
 # against the average log-expression across those libraries (the mean).
 # The following command produces an MD plot that compares

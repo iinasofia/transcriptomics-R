@@ -64,7 +64,7 @@ library(readr)
 tx2gene <- read.csv("2-Input/Homo_sapiens.GRCh38.91_tx2gene.csv")
 head(tx2gene, 5)
 
-# create links to salmon quant folders to import salmon files. "<-" defines the folders/directories that we want to look at
+# create links to salmon quant folders to import salmon files. "<-" defines the folders/directories that we want to look at --- file format is *.csv
 folder <- c("2-Input/cell_quants")
 salmon.dir <- as.matrix(read.csv(file="2-Input/quant_filenames.csv", sep=",", header=F))
 
@@ -79,10 +79,13 @@ all(file.exists(salmon.files))
 # Both are then quantities that are on the same scale as original counts,
     # except no longer correlated with feature length across samples.
     
-#gene level summary and salmon index building .. quantification file built using salmon as above, this generates an offset matrix for downstream gene-level differential analysis of count matrices
+#gene level summary and salmon index building .. quantification file built using salmon as above, this generates an offset matrix for downstream gene-level differential analysis of count matrices ---- a matrix is a collection of elements of the same data type (numeric, character, or logical) arranged into a fixed number of rows and columns
+# lengthScaledTPM first multiplies TPM by feature length and then scales up to library size
+# tximport is able to import counts produced by different software, and different workflows are described for each in the tximport vignette.
 txi <- tximport(salmon.files, type="salmon", tx2gene=tx2gene, ignoreTxVersion = TRUE, countsFromAbundance="lengthScaledTPM") 
 names(txi)
 head(txi$counts, 3)
+#write.csv = save summaries of partitioned breeding values to CSV files on disk for further analyses of processing with other software or just for saving (backing up) results
 write.csv(txi, file = "4-Output/geneSMART_tximport_matrix.csv")
 
 # prepare data

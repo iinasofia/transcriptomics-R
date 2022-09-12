@@ -541,7 +541,9 @@ glXYPlot(x=fit2$coef[,"P4-PRE"], y=fit2$lod[,"P4-PRE"], xlab="logFC", ylab="logo
 
 ###############################################################
 
-# which genes respond to exercise - P0 relative to PRE?
+# which genes respond to heparin treatment -- P5 D3 vs D5?
+# which genes respond to heparin treatment -- P5 D3 vs P13 D3?
+# which genes respond to heparin treatment -- 20176s vs 21558s?
 r1 <- topTable(fit2, adjust="BH", coef=1, n=Inf)
 write.csv(r1, file="4-Output/topTable_P0-PRE.csv")
 sig <- r1$adj.P.Val <0.05

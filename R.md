@@ -391,10 +391,10 @@ plotMD(y.Norm, column=1, main="First sample (TMM-normalised)"); abline(h=0, col=
 dev.off()
 
 # Limma design matrix
-# group <- y$samples$timepoint
-#design <- model.matrix(~0+group)
-#colnames(design) <- levels(group)
-#design
+group <- y$samples$timepoint
+design <- model.matrix(~0+group)
+colnames(design) <- levels(group)
+design
 
 # Paired design using DuplicateCorrelation
 #https://support.bioconductor.org/p/52920/  https://support.bioconductor.org/p/59700/

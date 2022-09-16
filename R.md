@@ -425,6 +425,8 @@ cont.matrix = makeContrasts("20176_P13_D3_treated-Untreated" = hMSC20176P13D3tre
                             "20176_P7-21558_P7treated" = ((hMSC20176P7D5treated - hMSC20176P7D5untreated) - (hMSC20176P7D3treated - hMSC20176P7D3untreated)) - ((hMSC21558P7D5treated - hMSC21558P7D5untreated) - (hMSC21558P7D3treated - hMSC21558P7D3untreated)),
                             "20176_P5-21558_P5treated" = ((hMSC20176P5D5treated - hMSC20176P5D5untreated) - (hMSC20176P5D3treated - hMSC20176P5D3untreated)) - ((hMSC21558P5D5treated - hMSC21558P5D5untreated) - (hMSC21558P5D3treated - hMSC21558P5D3untreated)),
                             levels=design)
+# check the matrix 
+cont.matrix
 
 fit2 = contrasts.fit(fit, cont.matrix)
 fit2 = eBayes(fit2)

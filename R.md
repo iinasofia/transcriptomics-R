@@ -97,10 +97,10 @@ library(Homo.sapiens)
 y <- DGEList(txi$counts)
 dim(y)
 
-# Read in sample information table #figure out what all this means??
+# Read in sample information table
 csvfile <- file.path("2-Input/Cell_sample_table.csv")
 sampleTable <- read.csv(csvfile, row.names=1)
-y$samples$name <- sampleTable$name
+y$samples$names <- sampleTable$name
 y$samples$filename <- sampleTable$filename
 y$samples$Sample_ID <- sampleTable$Sample_ID
 y$samples$cell_line <- sampleTable$cell_line
@@ -108,16 +108,10 @@ y$samples$Passage <- sampleTable$Passage
 y$samples$Day <- sampleTable$Day
 y$samples$Treatment <- sampleTable$Treatment
 y$samples$run_date <- sampleTable$run_date
-y$samples$subject <- sampleTable$subject
-y$samples$timepoint <- sampleTable$timepoint
-y$samples$id <- sampleTable$id
+y$samples$day <- sampleTable$Day
+y$samples$id <- sampleTable$Sample_ID
 y$samples$run_date <- sampleTable$run_date
-y$samples$chip <- sampleTable$chip
-y$samples$Haplogroups <- sampleTable$Haplogroups
-y$samples$Haplogroup_range <- sampleTable$Haplogroup_range
-y$samples$ACE <- sampleTable$ACE
-y$samples$ACTN3 <- sampleTable$ACTN3
-y$samples$ACSL1 <- sampleTable$ACSL1
+y$samples$cell_line <- sampleTable$cell_line
 y$samples
 
 #gives you all the column names for all the samples
@@ -153,7 +147,7 @@ head(genes,5)
 dim(genes)
 
 #This is where the actual analysis begins, above is QC/cleanup 
-#change timepoint
+#change point
 # Barplot of library sizes -- this will create a barplot of library sizes (i.e. how big the reads are)
 png("3-QC/Barplot of library sizes.png", width = 90, height = 30, units = 'cm', res = 300)
 col <- as.numeric(y$sample$timepoint)
@@ -298,7 +292,7 @@ summary(y.Norm$samples$norm.factors)
 png("3-QC/BoxplotBefore.png", width = 90, height = 45, units = 'cm', res = 300)
 par(mfrow=c(2,1))
 lcpm.Filt <- cpm(y.Filt, log=TRUE)
-col <- as.numeric(y$sample$timepoint)
+col <- as.numeric(y$sample$tDay)
 boxplot(lcpm.Filt,las=2,
         col=c("lightsalmon","lightcoral","steelblue1","cornsilk")[col],main="")
 abline(h=median(lcpm.Filt),col="black",lty=3)
@@ -356,7 +350,7 @@ plotMD(y.Norm, column=1, main="First sample (TMM-normalised)"); abline(h=0, col=
 dev.off()
 
 # Limma design matrix
-group <- y$samples$timepoint
+group <- y$samples$Day
 design <- model.matrix(~0+group)
 colnames(design) <- levels(group)
 design

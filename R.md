@@ -49,7 +49,7 @@ salmon quant -i salmon_index/ -l A -r "${justname}".fq.gz -p 12 --output "${just
 
 # Set working directory & load packages 
 #working directory (all post QC files should be here) 
-setwd("U:/Research/Projects/ihbi/grc/grc_general/Stem Cell Group/Sofia/Transcriptomics/Cell")
+setwd("U:/Research/Projects/ihbi/grc/grc_general/Stem Cell Group/Sofia/Transcriptomics")
 #create folders for R QC and output per below 
 dir.create("3-QC")
 dir.create("4-Output")
@@ -92,6 +92,7 @@ write.csv(txi, file = "4-Output/geneSMART_tximport_matrix.csv")
 #start by loading libraries. #Use edgeR package to import, organise, filter and normalise the data
 library(edgeR)
 library(Homo.sapiens)
+library(limma)
 
 # edgeR used to read in count data
 y <- DGEList(txi$counts)
@@ -371,6 +372,7 @@ save(v, file="4-Output/v.rda")
 # Use the SVD functon in ChAMP to assess which covariates correlate with the top components
 library(ChAMP)
 
+#THE ISSUE IS HERE!!!
 pd <- v$targets[,c(colnames)]
 colnames(pd)[1] <- "Sample_Names"
 champ.SVD(beta=v$E, pd=pd, PDFplot=TRUE, Rplot=FALSE, resultsDir="./3-QC/")

@@ -1,49 +1,5 @@
-# transcriptomics-R AND BASH
-#PRE-R/QC on .bam files. This will QC files and convert to workable files with R
-#run Docker container (iinasofia/transcriptome) for each BAM file
 
-#make sure docker is up and running 
-docker ps 
-
-#Set directory -- including full file path 
-cd '.\OneDrive - Queensland University of Technology\Documents\Transcriptomics\Data\hMSC-20176\hMSC-20176_P5_D5_HEP'
-
-#run Docker program -- file name needs to match fully (TEST=full file name) 
-docker run -v ${pwd}:/app iinasofia/transcriptome TEST.bam
-
-#This will run whole docker script for 1 x BAM file as below, steps specified 
-set -e
-
-#set filename
-filename=$1
-
-#removes .bam extension
-justname=$(echo "${filename%.*}")
-
-#echo "***** Processing ${justname}"
-
-#echo "***** Converting to fastq file..."
-bedtools bamtofastq -i "${filename}" -fq "${justname}".fq
-
-#echo "***** bgzipping..."
-bgzip -i "${justname}".fq
-
-#echo "***** Running fastqc...";
-fastqc --contaminants /deps/contaminant_list.txt "${justname}".fq.gz -o .;
-
-#echo "***** Trimming with reformat.sh..."
-reformat.sh -Xmx16g in="${justname}".fq.gz out="${justname}"_trimmed.fq.gz minlength=50 maxlength=150 overwrite=TRUE
-
-#echo "***** Building an index with salmon..."
-salmon index -t "${justname}"_trimmed.fq.gz -i salmon_index/ --type puff
-
-#echo "***** Quantifying with salmon..."
-salmon quant -i salmon_index/ -l A -r "${justname}".fq.gz -p 12 --output "${justname}"_quant;
-
-#echo "***** Done!"
-
-
-#R SCRIPT POST SALMON/QC
+#R SCRIPT 
 #source("https://bioconductor.org/biocLite.R")
 #biocLite(c("edgeR", "Homo.sapiens"))
 
@@ -94,7 +50,7 @@ library(edgeR)
 library(Homo.sapiens)
 library(limma)
 
-# edgeR used to read in count data
+# edgeR used to read in count data (DGEList -- Creates a DGEList object from a table of counts (rows=features, columns=samples), group indicator for each column, library size (optional) and a table of feature annotation (optional); dim -- Retrieve or set the dimension of an object.)
 y <- DGEList(txi$counts)
 dim(y)
 
@@ -374,7 +330,7 @@ library(ChAMP)
 
 #THE ISSUE IS HERE!!!
 pd <- v$targets[,c(colnames)]
-colnames(pd)[1] <- "Sample_Names"
+colnames(pd)[1] <- y$samples$filename
 champ.SVD(beta=v$E, pd=pd, PDFplot=TRUE, Rplot=FALSE, resultsDir="./3-QC/")
 
 glMDSPlot(v, top=500, labels=v$targets$cell_line,

@@ -33,8 +33,8 @@ all(file.exists(salmon.files))
 # scaledTPM is TPM scaled up to library sizewhile lengthScaledTPM
 # lengthScaledTPM first multiplies TPM by feature length and then scales up to library size
 # Both are then quantities that are on the same scale as original counts,
-    # except no longer correlated with feature length across samples.
-    
+# except no longer correlated with feature length across samples.
+
 #gene level summary and salmon index building .. quantification file built using salmon as above, this generates an offset matrix for downstream gene-level differential analysis of count matrices ---- a matrix is a collection of elements of the same data type (numeric, character, or logical) arranged into a fixed number of rows and columns
 # lengthScaledTPM first multiplies TPM by feature length and then scales up to library size
 # tximport is able to import counts produced by different software, and different workflows are described for each in the tximport vignette.
@@ -72,8 +72,8 @@ y$samples$cell_line <- sampleTable$cell_line
 y$samples
 
 #gives you all the column names for all the samples
-colnames <- colnames(y$samples)
-colnames
+colnames1 <- colnames(y$samples)
+colnames1
 
 # Add gene annotation
 geneid <- rownames(y)
@@ -287,7 +287,7 @@ plotMDS(y.Norm, top=500, cex=0.8, labels=y.Norm$samples$cell_line, col=as.numeri
 legend("topright", legend=c("hMSC-20176", "hMSC-21558"), cex=0.8, col=1:16, pch=16)
 
 plotMDS(y.Norm, top=500, cex=1, pch=21, col="white", bg=as.numeric(y.Norm$samples$Treatment), main="MDS Plot (Symbol)")
-# pch=xx; 0= open square; 1= open circle; 15= solid square, 16=solid circle, 21=filled circle/border
+pch=xx; 0= open square; 1= open circle; 15= solid square, 16=solid circle, 21=filled circle/border
 legend("topright", legend=c("hMSC-20176", "hMSC-21558"), cex=0.8, col=1:16, pch=16)
 dev.off()
 
@@ -329,7 +329,7 @@ save(v, file="4-Output/v.rda")
 library(ChAMP)
 
 #THE ISSUE IS HERE!!!
-pd <- v$targets[,c(colnames)]
+pd <- v$targets[,c(colnames1)]
 colnames(pd)[1] <- y$samples$filename
 champ.SVD(beta=v$E, pd=pd, PDFplot=TRUE, Rplot=FALSE, resultsDir="./3-QC/")
 
@@ -467,7 +467,7 @@ r1 <- topTable(fit2, adjust="BH", coef=1, n=Inf)
 write.csv(r1, file="4-Output/topTable_P0-PRE.csv")
 sig <- r1$adj.P.Val <0.05
 cat("No.Sig.Genes.P0-PRE:", length(which(sig==1)))
-  
+
 # which genes respond to exercise - P3 relative to PRE?
 r2 <- topTable(fit2, adjust="BH", coef=2, n=Inf)
 write.csv(r2, file="4-Output/topTable_P3-PRE.csv")

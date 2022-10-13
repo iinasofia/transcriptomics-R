@@ -286,12 +286,11 @@ par(mfrow=c(2,1))
 plotMDS(y.Norm, top=500, cex=0.8, labels=y.Norm$samples$cell_line, col=as.numeric(y.Norm$samples$Treatment), main="MDS Plot (SampleID)")
 legend("topright", legend=c("hMSC-20176", "hMSC-21558"), cex=0.8, col=1:16, pch=16)
 
-plotMDS(y.Norm, top=500, cex=1, pch=21, col="white", bg=as.numeric(y.Norm$samples$Treatment), main="MDS Plot (Symbol)")
-pch=xx; 0= open square; 1= open circle; 15= solid square, 16=solid circle, 21=filled circle/border
-legend("topright", legend=c("hMSC-20176", "hMSC-21558"), cex=0.8, col=1:16, pch=16)
+plotMDS(y.Norm, top=500, cex=1, pch=21, col="white", bg=as.numeric(y.Norm$samples$timepoint), main="MDS Plot (Symbol)")
+legend("topright", legend=c("PRE", "P0", "P3", "P4"), cex=0.8, col=1:16, pch=16)
 dev.off()
 
-
+##PCH function guidelines: pch=xx; 0= open square; 1= open circle; 15= solid square, 16=solid circle, 21=filled circle/border
 
 
 # Mean Difference Plots - XY scatter plot that compares the disagreement, or differences, between two quantitative measurements
@@ -306,21 +305,39 @@ plotMD(y.Filt, column=1, main="First sample (raw)"); abline(h=0, col="red", lty=
 plotMD(y.Norm, column=1, main="First sample (TMM-normalised)"); abline(h=0, col="red", lty=2, lwd=2)
 dev.off()
 
+# Important! Limma design matrix
+#At this point all transcripts have been mapped to genes, zero counts have been excluded from further analysis, and all remaining counts have been normalised across samples. The following design matrix is the most important step of this script because it is when we actually tell the program what to compare for gene expression changes. (the design below considers the "PRE" timepoint as the baseline (which is correct but only considers the question "what changes between timepoints for all samples whether they are responders or not"))
+
+```{R}
+group <- y$samples$timepoint
+design <- model.matrix(~0+group)
+colnames(design) <- levels(group)
+design
+
+
 # Limma design matrix
 group <- y$samples$Day
 design <- model.matrix(~0+group)
 colnames(design) <- levels(group)
 design
 
-# Paired design using DuplicateCorrelation
+## Paired design using DuplicateCorrelation
 #https://support.bioconductor.org/p/52920/  https://support.bioconductor.org/p/59700/
-Group <- y.Norm$samples$Sample_ID
+
+Group <- y.Norm$samples$timepoint
 design <- model.matrix(~0 + Group)
 
 v <- voom(y.Norm, design)
 colnames(design) <- c("hMSC20176P13D3untreated", "hMSC20176P13D3treated", "hMSC20176P13D5untreated", "hMSC20176P13D5treated", "hMSC20176P5D3untreated", "hMSC20176P5D3treated", "hMSC20176P5D5untreated", "hMSC20176P5D5treated", "hMSC20176P7D3untreated", "hMSC20176P7D3treated", "hMSC20176P7D5untreated", "hMSC20176P7D5treated", "hMSC21558P13D3untreated", "hMSC21558P13D3treated", "hMSC21558P13D5untreated", "hMSC21558P13D5treated", "hMSC21558P5D3untreated", "hMSC21558P5D3treated", "hMSC21558P5D5untreated", "hMSC21558P5D5treated", "hMSC21558P7D3untreated", "hMSC21558P7D3treated", "hMSC21558P7D5untreated", "hMSC21558P7D5treated")
 corfit <- duplicateCorrelation(v, design, block=y.Norm$samples$cell_line)
 v <- voom(y.Norm, design, block=y.Norm$samples$Sample_ID, correlation=corfit$consensus)
+
+#OG CODE
+#v <- voom(y.Norm, design)
+#colnames(design) <- c("P0","P3","P4","PRE")
+#corfit <- duplicateCorrelation(v, design, block=y.Norm$samples$subject)
+#v <- voom(y.Norm, design, block=y.Norm$samples$subject, correlation=corfit$consensus)
+
 
 save(v, file="4-Output/v.rda")
 
@@ -337,6 +354,16 @@ glMDSPlot(v, top=500, labels=v$targets$cell_line,
           groups=v$targets[,c(1:9)], launch=TRUE,
           path="5-Glimma", folder="glMDSPlot", html="MDS_plot_voom")
 
+#OG CODE
+pd <- v$targets[,c("Sample_ID","cell_line","Passage","Day","Treatment")]
+colnames(pd)[1] <- "y$samples$names"
+champ.SVD(beta=v$E, pd=pd, PDFplot=TRUE, Rplot=FALSE, resultsDir="./3-QC/")
+
+glMDSPlot(v, top=500, labels=v$targets$subject,
+          groups=v$targets[,c(1:9)], launch=TRUE,
+          path="5-Glimma", folder="glMDSPlot", html="MDS_plot_voom")
+          
+          
 # MD plot before and after normalisation
 png("3-QC/MDPlots-sample54.png", width=20, height=40, units='cm', res=300)
 par(mfrow=c(3,1))

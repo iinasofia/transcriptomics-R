@@ -326,6 +326,7 @@ save(v, file="4-Output/v.rda")
 
 
 # Use the SVD functon in ChAMP to assess which covariates correlate with the top components
+# Covariate === an independent variable that can influence the outcome of a given statistical trial, but which is not of direct interest.
 library(ChAMP)
 
 #THE ISSUE IS HERE!!!
@@ -350,8 +351,12 @@ dev.off()
 #lfc <- log2(1.1) # use for TREAT only
 
 #include group before??????
+# Design matrix=	Used to define the form of a statistical model and to store observed values of the explanatory variable(s). Used in the computation process to estimate model parameters. 
+#Contrast matrix=	Used in conjunction with a design matrix to calculate specific values of interest between estimated parameters.
 fit <- lmFit(v, design, block=y.Norm$samples$cell_line, correlation=corfit$consensus)
-cont.matrix = makeContrasts("20176_P13_D3_treated-Untreated" = hMSC20176P13D3treated - hMSC20176P13D3untreated,
+cont.matrix = makeContrasts("20176_P5_D3_treated-20176_P13_D3_treated" = hMSC20176P5D3treated - hMSC20176P13D3treated, "20176_P5_D3_untreated-20176_P13_D3_untreated" - hMSC20176P5D3untreated - hMSC20176P13D3untreated, "hMSC_P5_D3_treated-hMSC_P13_D3_treated" = (hMSC20176P5D3treated - hMSC21558P5D3treated) - (hMSC20176P13D3treated - hMSC2155813D3treated))
+
+("20176_P13_D3_treated-Untreated" = hMSC20176P13D3treated - hMSC20176P13D3untreated,
                             "20176_P13_D5_untreated-treated" = hMSC20176P13D5treated - hMSC20176P13D5untreated,
                             "20176_P13_D5-D3treated" = (hMSC20176P13D5treated - hMSC20176P13D5untreated) - (hMSC20176P13D3treated - hMSC20176P13D3untreated),
                             "20176_P5_D3_untreated-treated" = hMSC20176P5D3treated - hMSC20176P5D3untreated,

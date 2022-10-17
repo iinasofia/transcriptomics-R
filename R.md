@@ -352,9 +352,13 @@ dev.off()
 
 #include group before??????
 # Design matrix=	Used to define the form of a statistical model and to store observed values of the explanatory variable(s). Used in the computation process to estimate model parameters. 
+#make a model matrix instead of whatever is happening here ????? 
 #Contrast matrix=	Used in conjunction with a design matrix to calculate specific values of interest between estimated parameters.
+#Levels	Unique = values within a factor, e.g. wildtype or mutant.
 fit <- lmFit(v, design, block=y.Norm$samples$cell_line, correlation=corfit$consensus)
-cont.matrix = makeContrasts("20176_P5_D3_treated-20176_P13_D3_treated" = hMSC20176P5D3treated - hMSC20176P13D3treated, "20176_P5_D3_untreated-20176_P13_D3_untreated" - hMSC20176P5D3untreated - hMSC20176P13D3untreated, "hMSC_P5_D3_treated-hMSC_P13_D3_treated" = (hMSC20176P5D3treated - hMSC21558P5D3treated) - (hMSC20176P13D3treated - hMSC2155813D3treated))
+cont.matrix = makeContrasts("20176_P5_D3_treated-20176_P13_D3_treated" = hMSC20176P5D3treated - hMSC20176P13D3treated, "20176_P5_D3_untreated-20176_P13_D3_untreated" - hMSC20176P5D3untreated - hMSC20176P13D3untreated, "hMSC_P5_D3_treated-hMSC_P13_D3_treated" = (hMSC20176P5D3treated - hMSC21558P5D3treated) - (hMSC20176P13D3treated - hMSC2155813D3treated), "20176_P5_D3_untreated-treated" = hMSC20176P5D3treated - hMSC20176P5D3untreated, levels=design)
+
+cont.matrix = makeContrasts("20176_P13_D3_treated-Untreated" = hMSC20176P13D3treated - hMSC20176P13D3untreated, levels=design)
 
 ("20176_P13_D3_treated-Untreated" = hMSC20176P13D3treated - hMSC20176P13D3untreated,
                             "20176_P13_D5_untreated-treated" = hMSC20176P13D5treated - hMSC20176P13D5untreated,
@@ -385,7 +389,10 @@ cont.matrix = makeContrasts("20176_P5_D3_treated-20176_P13_D3_treated" = hMSC201
 # check the matrix 
 cont.matrix
 
+#contrast.fit == Given a linear model fit to microarray data, compute estimated coefficients and standard errors for a given set of contrasts.
 fit2 = contrasts.fit(fit, cont.matrix)
+#non-Bayesian analysis??
+#try different matrices, see if that makes a differenve ---- Try a different analysis style too. Lol 
 fit2 = eBayes(fit2)
 #fit2 <- treat(fit2, lfc=lfc)
 
@@ -397,7 +404,8 @@ plotSA(fit2, main="Final model: Mean−variance trend")
 dev.off()
 
 
-# Differential Expression
+# Differential Expression 
+# p value and method in here --- p<0.05 , log fold change min 0 
 results <- decideTests(fit2)
 summary(results)
 vennCounts(results)

@@ -308,14 +308,24 @@ dev.off()
 
 # Limma design matrix
 data <- y$samples
+# create a design matrix of no intercept, only treated vs untreated
 design2 <- model.matrix(~0+data$Treatment)
+# set the names of columns in the design matrix accordingly
 colnames(design2) <- c("Treated", "Untreated")
+# create a contrast matrix comparing the treated vs untreated groups in this design matrix
 contrast.matrix <- makeContrasts("Treated-Untreated", levels=design2)
+# do some magic to grab the data from the RNA sequences corresponding to the regression we want to run so that it's ready for the linear model
 v2 <- voom(y.Norm, design2)
+# fit a linear model using the design matrix only
 fit2 <- lmFit(v2, design2)
+# fit the contrasts to get info between groups
 fit2c <- contrasts.fit(fit2, contrast.matrix)
+# compute statistics of the linear model using empirical bayes
 fit2c <- eBayes(fit2c)
+# print table of top predictors
 topTable(fit2c)
+
+
 
 fit2 <- lmFit(data, design2)
 

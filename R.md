@@ -307,6 +307,18 @@ plotMD(y.Norm, column=1, main="First sample (TMM-normalised)"); abline(h=0, col=
 dev.off()
 
 # Limma design matrix
+data <- y$samples
+design2 <- model.matrix(~0+data$Treatment)
+colnames(design2) <- c("Treated", "Untreated")
+contrast.matrix <- makeContrasts("Treated-Untreated", levels=design2)
+v2 <- voom(y.Norm, design2)
+fit2 <- lmFit(v2, design2)
+fit2c <- contrasts.fit(fit2, contrast.matrix)
+fit2c <- eBayes(fit2c)
+topTable(fit2c)
+
+fit2 <- lmFit(data, design2)
+
 group <- y$samples$Day
 design <- model.matrix(~0+group)
 colnames(design) <- levels(group)
@@ -361,31 +373,31 @@ cont.matrix = makeContrasts("20176_P5_D3_treated-20176_P13_D3_treated" = hMSC201
 cont.matrix = makeContrasts("20176_P13_D3_treated-Untreated" = hMSC20176P13D3treated - hMSC20176P13D3untreated, levels=design)
 
 ("20176_P13_D3_treated-Untreated" = hMSC20176P13D3treated - hMSC20176P13D3untreated,
-                            "20176_P13_D5_untreated-treated" = hMSC20176P13D5treated - hMSC20176P13D5untreated,
-                            "20176_P13_D5-D3treated" = (hMSC20176P13D5treated - hMSC20176P13D5untreated) - (hMSC20176P13D3treated - hMSC20176P13D3untreated),
-                            "20176_P5_D3_untreated-treated" = hMSC20176P5D3treated - hMSC20176P5D3untreated,
-                            "20176_P5_D5_untreated-treated" = hMSC20176P5D5treated - hMSC20176P5D5untreated,
-                            "20176_P5_D5-D3treated" = (hMSC20176P5D5treated - hMSC20176P5D5untreated) - (hMSC20176P5D3treated - hMSC20176P5D3untreated),
-                            "20176_P7_D3_untreated-treated" = hMSC20176P7D3treated - hMSC20176P7D3untreated,
-                            "20176_P7_D5_untreated-treated" = hMSC20176P7D5treated - hMSC20176P7D5untreated,
-                            "20176_P7_D5-D3treated" = (hMSC20176P7D5treated - hMSC20176P7D5untreated) - (hMSC20176P7D3treated - hMSC20176P7D3untreated),
-                            "20176_P13-P5treated" = ((hMSC20176P13D5treated - hMSC20176P13D5untreated) - (hMSC20176P13D3treated - hMSC20176P13D3untreated)) - ((hMSC20176P5D5treated - hMSC20176P5D5untreated) - (hMSC20176P5D3treated - hMSC20176P5D3untreated)),
-                            "20176_P7-P5treated" = ((hMSC20176P7D5treated - hMSC20176P7D5untreated) - (hMSC20176P7D3treated - hMSC20176P7D3untreated)) - ((hMSC20176P5D5treated - hMSC20176P5D5untreated) - (hMSC20176P5D3treated - hMSC20176P5D3untreated)),
-                            "21558_P13_D3_treated-Untreated" = hMSC21558P13D3treated - hMSC21558P13D3untreated,
-                            "21558_P13_D5_untreated-treated" = hMSC21558P13D5treated - hMSC21558P13D5untreated,
-                            "21558_P13_D5-D3treated" = (hMSC21558P13D5treated - hMSC21558P13D5untreated) - (hMSC21558P13D3treated - hMSC21558P13D3untreated),
-                            "21558_P5_D3_untreated-treated" = hMSC21558P5D3treated - hMSC21558P5D3untreated,
-                            "21558_P5_D5_untreated-treated" = hMSC21558P5D5treated - hMSC21558P5D5untreated,
-                            "21558_P5_D5-D3treated" = (hMSC21558P5D5treated - hMSC21558P5D5untreated) - (hMSC21558P5D3treated - hMSC21558P5D3untreated),
-                            "21558_P7_D3_untreated-treated" = hMSC21558P7D3treated - hMSC21558P7D3untreated,
-                            "21558_P7_D5_untreated-treated" = hMSC21558P7D5treated - hMSC21558P7D5untreated,
-                            "21558_P7_D5-D3treated" = (hMSC21558P7D5treated - hMSC21558P7D5untreated) - (hMSC21558P7D3treated - hMSC21558P7D3untreated),
-                            "21558_P13-P5treated" = ((hMSC21558P13D5treated - hMSC21558P13D5untreated) - (hMSC21558P13D3treated - hMSC21558P13D3untreated)) - ((hMSC21558P5D5treated - hMSC21558P5D5untreated) - (hMSC21558P5D3treated - hMSC21558P5D3untreated)),
-                            "21558_P7-P5treated" = ((hMSC21558P7D5treated - hMSC21558P7D5untreated) - (hMSC21558P7D3treated - hMSC21558P7D3untreated)) - ((hMSC21558P5D5treated - hMSC21558P5D5untreated) - (hMSC21558P5D3treated - hMSC21558P5D3untreated)),
-                            "20176_P13-21558_P13treated" = ((hMSC20176P13D5treated - hMSC20176P13D5untreated) - (hMSC20176P13D3treated - hMSC20176P13D3untreated)) - ((hMSC21558P13D5treated - hMSC21558P13D5untreated) - (hMSC21558P13D3treated - hMSC21558P13D3untreated)),
-                            "20176_P7-21558_P7treated" = ((hMSC20176P7D5treated - hMSC20176P7D5untreated) - (hMSC20176P7D3treated - hMSC20176P7D3untreated)) - ((hMSC21558P7D5treated - hMSC21558P7D5untreated) - (hMSC21558P7D3treated - hMSC21558P7D3untreated)),
-                            "20176_P5-21558_P5treated" = ((hMSC20176P5D5treated - hMSC20176P5D5untreated) - (hMSC20176P5D3treated - hMSC20176P5D3untreated)) - ((hMSC21558P5D5treated - hMSC21558P5D5untreated) - (hMSC21558P5D3treated - hMSC21558P5D3untreated)),
-                            levels=design)
+  "20176_P13_D5_untreated-treated" = hMSC20176P13D5treated - hMSC20176P13D5untreated,
+  "20176_P13_D5-D3treated" = (hMSC20176P13D5treated - hMSC20176P13D5untreated) - (hMSC20176P13D3treated - hMSC20176P13D3untreated),
+  "20176_P5_D3_untreated-treated" = hMSC20176P5D3treated - hMSC20176P5D3untreated,
+  "20176_P5_D5_untreated-treated" = hMSC20176P5D5treated - hMSC20176P5D5untreated,
+  "20176_P5_D5-D3treated" = (hMSC20176P5D5treated - hMSC20176P5D5untreated) - (hMSC20176P5D3treated - hMSC20176P5D3untreated),
+  "20176_P7_D3_untreated-treated" = hMSC20176P7D3treated - hMSC20176P7D3untreated,
+  "20176_P7_D5_untreated-treated" = hMSC20176P7D5treated - hMSC20176P7D5untreated,
+  "20176_P7_D5-D3treated" = (hMSC20176P7D5treated - hMSC20176P7D5untreated) - (hMSC20176P7D3treated - hMSC20176P7D3untreated),
+  "20176_P13-P5treated" = ((hMSC20176P13D5treated - hMSC20176P13D5untreated) - (hMSC20176P13D3treated - hMSC20176P13D3untreated)) - ((hMSC20176P5D5treated - hMSC20176P5D5untreated) - (hMSC20176P5D3treated - hMSC20176P5D3untreated)),
+  "20176_P7-P5treated" = ((hMSC20176P7D5treated - hMSC20176P7D5untreated) - (hMSC20176P7D3treated - hMSC20176P7D3untreated)) - ((hMSC20176P5D5treated - hMSC20176P5D5untreated) - (hMSC20176P5D3treated - hMSC20176P5D3untreated)),
+  "21558_P13_D3_treated-Untreated" = hMSC21558P13D3treated - hMSC21558P13D3untreated,
+  "21558_P13_D5_untreated-treated" = hMSC21558P13D5treated - hMSC21558P13D5untreated,
+  "21558_P13_D5-D3treated" = (hMSC21558P13D5treated - hMSC21558P13D5untreated) - (hMSC21558P13D3treated - hMSC21558P13D3untreated),
+  "21558_P5_D3_untreated-treated" = hMSC21558P5D3treated - hMSC21558P5D3untreated,
+  "21558_P5_D5_untreated-treated" = hMSC21558P5D5treated - hMSC21558P5D5untreated,
+  "21558_P5_D5-D3treated" = (hMSC21558P5D5treated - hMSC21558P5D5untreated) - (hMSC21558P5D3treated - hMSC21558P5D3untreated),
+  "21558_P7_D3_untreated-treated" = hMSC21558P7D3treated - hMSC21558P7D3untreated,
+  "21558_P7_D5_untreated-treated" = hMSC21558P7D5treated - hMSC21558P7D5untreated,
+  "21558_P7_D5-D3treated" = (hMSC21558P7D5treated - hMSC21558P7D5untreated) - (hMSC21558P7D3treated - hMSC21558P7D3untreated),
+  "21558_P13-P5treated" = ((hMSC21558P13D5treated - hMSC21558P13D5untreated) - (hMSC21558P13D3treated - hMSC21558P13D3untreated)) - ((hMSC21558P5D5treated - hMSC21558P5D5untreated) - (hMSC21558P5D3treated - hMSC21558P5D3untreated)),
+  "21558_P7-P5treated" = ((hMSC21558P7D5treated - hMSC21558P7D5untreated) - (hMSC21558P7D3treated - hMSC21558P7D3untreated)) - ((hMSC21558P5D5treated - hMSC21558P5D5untreated) - (hMSC21558P5D3treated - hMSC21558P5D3untreated)),
+  "20176_P13-21558_P13treated" = ((hMSC20176P13D5treated - hMSC20176P13D5untreated) - (hMSC20176P13D3treated - hMSC20176P13D3untreated)) - ((hMSC21558P13D5treated - hMSC21558P13D5untreated) - (hMSC21558P13D3treated - hMSC21558P13D3untreated)),
+  "20176_P7-21558_P7treated" = ((hMSC20176P7D5treated - hMSC20176P7D5untreated) - (hMSC20176P7D3treated - hMSC20176P7D3untreated)) - ((hMSC21558P7D5treated - hMSC21558P7D5untreated) - (hMSC21558P7D3treated - hMSC21558P7D3untreated)),
+  "20176_P5-21558_P5treated" = ((hMSC20176P5D5treated - hMSC20176P5D5untreated) - (hMSC20176P5D3treated - hMSC20176P5D3untreated)) - ((hMSC21558P5D5treated - hMSC21558P5D5untreated) - (hMSC21558P5D3treated - hMSC21558P5D3untreated)),
+  levels=design)
 # check the matrix 
 cont.matrix
 
